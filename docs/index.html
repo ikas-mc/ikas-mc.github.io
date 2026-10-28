@@ -1,48 +1,320 @@
 <!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IKAS</title>
-  <meta name="description" content="qzxvt rn8k pw2h" />
-</head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects</title>
+<meta name="description" content="My projects and Apps">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>&#9670;</text></svg>">
+<style>
+  :root {
+    --bg: #fcfcfb;
+    --ink: #17171a;
+    --body: #3f3f42;
+    --muted: #8b8b88;
+    --line: #e6e6e1;
+    --hover: #f3f3ef;
+    --sel: #e7e7df;
+  }
 
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e0e0f;
+      --ink: #ededea;
+      --body: #b4b4b0;
+      --muted: #75756f;
+      --line: #26262a;
+      --hover: #17171a;
+      --sel: #2c2c31;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection { background: var(--sel); }
+
+  .wrap {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 5.5rem 1.5rem 7rem;
+  }
+
+
+  h1 {
+    margin: 0 0 .75rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+
+  .lede {
+    margin: 0 0 1.1rem;
+    max-width: 38rem;
+    color: var(--body);
+    font-size: .93rem;
+  }
+
+  .stamp {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .74rem;
+    letter-spacing: .02em;
+    color: var(--muted);
+  }
+
+
+  section { margin-top: 3.25rem; }
+
+  h2 {
+    margin: 0;
+    padding-bottom: .7rem;
+    border-bottom: 1px solid var(--line);
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  ul.items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+    gap: .1rem 2rem;
+    margin: 0 -.7rem;
+    padding: 1.15rem .7rem;
+  }
+
+  .item::after {
+    content: "";
+    position: absolute;
+    left: .7rem;
+    right: .7rem;
+    bottom: 0;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .item:hover { background: var(--hover); }
+
+  .lead { min-width: 0; }
+
+  .name {
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .92rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    overflow-wrap: anywhere;
+  }
+
+  .name:hover { border-bottom-color: currentColor; }
+
+  .meta {
+    display: block;
+    margin-top: .25rem;
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .72rem;
+    letter-spacing: .02em;
+    color: var(--muted);
+  }
+
+  .desc {
+    margin: 0 0 .45rem;
+    font-size: .9rem;
+    line-height: 1.6;
+    color: var(--body);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .1rem .7rem;
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .755rem;
+    letter-spacing: .01em;
+  }
+
+  .links a {
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+  }
+
+  .links a:hover {
+    color: var(--ink);
+    text-decoration-color: currentColor;
+  }
+
+
+  footer {
+    margin-top: 4.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1rem;
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .74rem;
+    color: var(--muted);
+  }
+
+  footer a {
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+  }
+
+  footer a:hover { color: var(--ink); text-decoration-color: currentColor; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 3.5rem 1.25rem 5rem; }
+    .item { grid-template-columns: minmax(0, 1fr); gap: .3rem; }
+    ul.items { margin-top: 2.5rem; }
+  }
+</style>
+</head>
 <body>
+<div class="wrap">
+
   <header>
-    <h1>ikas-mc</h1>
-    <p>qzxvt rn8k pw2h gj5m--zq3f|nr7x&kb4t[vd9w]</p>
+    <h1>Projects</h1>
+    <p class="lede">My projects and Apps</p>
+    <p class="stamp">Last updated 2026-10-28</p>
   </header>
 
-  <main>
-    <section id="projects">
-      <h2>ptxkq zrnv</h2>
-      <article id="auto-deploy-kit">
-        <h3>wqz8x nvkt</h3>
-        <p>t4q</p>
-        <p>rm4px tj2q--kz9vn^xh5t|bs2w[qp0m]</p>
-        <p>
-          <a href="https://github.com/ikas-mc" target="_blank" rel="noreferrer">s7c</a>
-        </p>
-      </article>
-      <article id="retro-control-panel">
-        <h3>vj3mq z8kt</h3>
-        <p>y6d</p>
-        <p>xh5t nr7x|kb4t--vd9w^qzxv[rn8k]</p>
-        <p>
-          <a href="https://github.com/ikas-mc" target="_blank" rel="noreferrer">s7c</a>
-        </p>
-      </article>
-      <article id="arcade-experiments">
-        <h3>k2nzp m4xw</h3>
-        <p>b8f</p>
-        <p>gj5m pw2h&zq3f--t4q^rm4p[kz9v]</p>
-        <p>
-          <a href="https://github.com/ikas-mc" target="_blank" rel="noreferrer">s7c</a>
-        </p>
-      </article>
-    </section>
-  </main>
-</body>
+  <section aria-labelledby="index">
+    <h2 id="index">Index</h2>
+    <ul class="items">
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://github.com/ikas-mc/ContextMenuForWindows11">Custom Context Menu</a>
+          <span class="meta">open source</span>
+        </div>
+        <div>
+          <p class="desc">Add Custom Context Menu For Windows11.</p>
+          <p class="links">
+            <a target="_blank" href="https://github.com/ikas-mc/ContextMenuForWindows11">github</a>
+            <a target="_blank" href="https://github.com/ikas-mc/ContextMenuForWindows11/releases">releases</a>
+            <a target="_blank" href="https://apps.microsoft.com/detail/9PC7BZZ28G0X">store</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://github.com/ikas-mc/ContextMenuBuilder">Custom Menu Builder</a>
+          <span class="meta">open source</span>
+        </div>
+        <div>
+          <p class="desc">Package builder for ContextMenuForWindows11.</p>
+          <p class="links">
+            <a target="_blank" href="https://github.com/ikas-mc/ContextMenuBuilder">github</a>
+            <a target="_blank" href="https://github.com/ikas-mc/ContextMenuBuilder/releases">releases</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://github.com/ikas-mc/mpv-uwp">mpv-uwp</a>
+          <span class="meta">open source</span>
+        </div>
+        <div>
+          <p class="desc">mpv fork for Xbox.</p>
+          <p class="links">
+            <a target="_blank" href="https://github.com/ikas-mc/mpv-uwp">github</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://github.com/ikas-mc/mpv-winui-player">mpv-winui-player</a>
+          <span class="meta">open source</span>
+        </div>
+        <div>
+          <p class="desc">Media player built on mpv and WinUI3.</p>
+          <p class="links">
+            <a target="_blank" href="https://github.com/ikas-mc/mpv-winui-player">github</a>
+            <a target="_blank" href="https://apps.microsoft.com/detail/9N7LXJ0MTWXD">store</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://apps.microsoft.com/detail/9NXm6552H2QL">Aow Tools</a>
+        </div>
+        <div>
+          <p class="desc">Apk Installer and Tools for wsa.</p>
+          <p class="links">
+            <a target="_blank" href="https://apps.microsoft.com/detail/9NXm6552H2QL">store</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://apps.microsoft.com/detail/9WZDNCRDG5HK">Yuki Explorer</a>
+        </div>
+        <div>
+          <p class="desc">File manager for Windows phone 8.1+</p>
+          <p class="links">
+            <a target="_blank" href="https://apps.microsoft.com/detail/9WZDNCRDG5HK">store</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://apps.microsoft.com/detail/9PNG5GMH1DVW">Index2 Player</a>
+        </div>
+        <div>
+          <p class="desc">Native UWP player that uses mpv as the playback engine, designed and optimized for Xbox.</p>
+          <p class="links">
+            <a target="_blank" href="https://apps.microsoft.com/detail/9PNG5GMH1DVW">store</a>
+          </p>
+        </div>
+      </li>
+      <li class="item">
+        <div class="lead">
+          <a class="name" href="https://github.com/ikas-mc/px-app">px-app</a>
+        </div>
+        <div>
+          <p class="desc">App, component, permission and AppOps manager for Android 10+.</p>
+          <p class="links">
+            <a target="_blank" href="https://github.com/ikas-mc/px-app">github</a>
+          </p>
+        </div>
+      </li>
+    </ul>
+  </section>
 
+  <footer>
+    <span>&copy; 2026 @ikas-mc</span>
+    <a target="_blank" href="https://github.com/ikas-mc">github</a>
+  </footer>
+
+</div>
+</body>
 </html>
