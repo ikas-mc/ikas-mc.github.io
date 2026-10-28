@@ -16,6 +16,9 @@
     --line: #e6e6e1;
     --hover: #f3f3ef;
     --sel: #e7e7df;
+    --g0: #3b6ea8;
+    --g1: #a4622a;
+    --g2: #52794f;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -27,6 +30,9 @@
       --line: #26262a;
       --hover: #17171a;
       --sel: #2c2c31;
+      --g0: #7fb3e0;
+      --g1: #d9a06b;
+      --g2: #93bd8c;
     }
   }
 
@@ -171,6 +177,90 @@
   }
 
 
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+    margin-top: 1.3rem;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  .cell {
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: clamp(.9rem, 3.2vw, 1.05rem);
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .12s ease, opacity .17s ease, transform .17s ease;
+  }
+
+  .cell[data-c="0"] { color: var(--g0); }
+  .cell[data-c="1"] { color: var(--g1); }
+  .cell[data-c="2"] { color: var(--g2); }
+
+  .cell:hover { background: var(--hover); }
+
+  .cell.sel {
+    background: var(--sel);
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+
+  .cell.pop { opacity: 0; transform: scale(.5); }
+  .cell.fresh { animation: cell-in .2s ease both; }
+  .cell.no { animation: cell-no .18s ease; }
+
+  @keyframes cell-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes cell-no {
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    margin-top: .8rem;
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: .72rem;
+    letter-spacing: .02em;
+    color: var(--muted);
+  }
+
+  .bar button {
+    font: inherit;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+  }
+
+  .bar button:hover { color: var(--ink); text-decoration-color: currentColor; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cell { transition: none; }
+    .cell.fresh, .cell.no { animation: none; }
+  }
+
+
   footer {
     margin-top: 4.5rem;
     padding-top: 1.5rem;
@@ -207,6 +297,15 @@
     <p class="lede">My projects and Apps</p>
     <p class="stamp">Last updated 2026-10-28</p>
   </header>
+
+  <section aria-labelledby="break">
+    <h2 id="break">Break</h2>
+    <div class="board" id="board" role="group" aria-label="Binary grid"></div>
+    <p class="bar">
+      <span><span id="pairs">0</span> pairs cleared</span>
+      <button type="button" id="reset">reset</button>
+    </p>
+  </section>
 
   <section aria-labelledby="index">
     <h2 id="index">Index</h2>
@@ -316,5 +415,167 @@
   </footer>
 
 </div>
+
+<script>
+(function () {
+  var ROWS = 6, COLORS = 3;
+  var COLS = 6, N = COLS * ROWS;
+  var board = document.getElementById('board');
+  if (!board) return;
+
+  var pairsEl = document.getElementById('pairs');
+  var resetEl = document.getElementById('reset');
+  var cells, sel, pairs, busy;
+
+  function fit() {
+    var w = board.clientWidth || (board.parentNode && board.parentNode.clientWidth) || 0;
+    var cols = Math.max(6, Math.min(16, Math.floor((w + 2) / 54)));
+    var changed = cols !== COLS;
+    COLS = cols;
+    N = COLS * ROWS;
+    board.style.gridTemplateColumns = 'repeat(' + COLS + ', minmax(0, 1fr))';
+    return changed;
+  }
+
+  function rnd() {
+    return { d: Math.random() < 0.5 ? 0 : 1, c: Math.floor(Math.random() * COLORS) };
+  }
+
+  function adj(a, b) {
+    var ra = Math.floor(a / COLS), ca = a % COLS;
+    var rb = Math.floor(b / COLS), cb = b % COLS;
+    return Math.abs(ra - rb) + Math.abs(ca - cb) === 1;
+  }
+
+  function can(a, b) {
+    return !!a && !!b && a.d !== b.d && a.c !== b.c;
+  }
+
+  function hasMove() {
+    for (var i = 0; i < N; i++) {
+      if (i % COLS + 1 < COLS && can(cells[i], cells[i + 1])) return true;
+      if (i + COLS < N && can(cells[i], cells[i + COLS])) return true;
+    }
+    return false;
+  }
+
+  function newBoard() {
+    do {
+      cells = [];
+      for (var i = 0; i < N; i++) cells.push(rnd());
+    } while (!hasMove());
+  }
+
+  function paint(fresh) {
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < N; i++) {
+      var v = cells[i];
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cell';
+      b.dataset.i = String(i);
+      b.dataset.c = String(v.c);
+      b.textContent = String(v.d);
+      if (i === sel) b.classList.add('sel');
+      if (fresh && fresh[i]) b.classList.add('fresh');
+      frag.appendChild(b);
+    }
+    board.textContent = '';
+    board.appendChild(frag);
+  }
+
+  function collapse() {
+    var added = {};
+    for (var c = 0; c < COLS; c++) {
+      var stack = [];
+      for (var r = ROWS - 1; r >= 0; r--) {
+        if (cells[r * COLS + c]) stack.push(cells[r * COLS + c]);
+      }
+      for (var r2 = ROWS - 1, k = 0; r2 >= 0; r2--, k++) {
+        cells[r2 * COLS + c] = stack[k] || null;
+      }
+      for (var r3 = 0; r3 < ROWS; r3++) {
+        var j = r3 * COLS + c;
+        if (cells[j] === null) {
+          cells[j] = rnd();
+          added[j] = true;
+        }
+      }
+    }
+    return added;
+  }
+
+  board.addEventListener('click', function (e) {
+    var el = e.target.closest('.cell');
+    if (!el || busy) return;
+    var i = Number(el.dataset.i);
+
+    if (sel === i) { sel = -1; paint(); return; }
+    if (sel < 0) { sel = i; paint(); return; }
+
+    if (!adj(sel, i) || !can(cells[sel], cells[i])) {
+      var from = sel;
+      sel = i;
+      paint();
+      var na = board.querySelector('.cell[data-i="' + from + '"]');
+      var nb = board.querySelector('.cell[data-i="' + i + '"]');
+      if (na) na.classList.add('no');
+      if (nb) nb.classList.add('no');
+      setTimeout(function () {
+        if (na) na.classList.remove('no');
+        if (nb) nb.classList.remove('no');
+      }, 200);
+      return;
+    }
+
+    var x = sel, y = i;
+    sel = -1;
+    busy = true;
+    var ea = board.querySelector('.cell[data-i="' + x + '"]');
+    if (ea) ea.classList.add('pop');
+    el.classList.add('pop');
+
+    setTimeout(function () {
+      cells[x] = null;
+      cells[y] = null;
+      var added = collapse();
+      if (!hasMove()) { newBoard(); added = null; }
+      pairs += 1;
+      pairsEl.textContent = String(pairs);
+      busy = false;
+      paint(added);
+    }, 170);
+  });
+
+  resetEl.addEventListener('click', function () {
+    if (busy) return;
+    sel = -1;
+    pairs = 0;
+    pairsEl.textContent = '0';
+    newBoard();
+    paint();
+  });
+
+  sel = -1;
+  pairs = 0;
+  busy = false;
+  fit();
+  newBoard();
+  paint();
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      if (busy) return;
+      if (fit()) {
+        sel = -1;
+        newBoard();
+        paint();
+      }
+    }, 150);
+  });
+})();
+</script>
 </body>
 </html>
